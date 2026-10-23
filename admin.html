@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · Raccolta 2026</title>
+<link rel="stylesheet" href="design/styles.css">
+<script src="design/_ds_bundle.js"></script>
+<script src="config.js"></script>
+<script src="olive-data.js"></script>
+<style>
+body{margin:0;background:var(--color-bg);color:var(--color-text)}
+a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-600)}
+input[type=range]{accent-color:var(--color-accent);width:100%;height:28px}
+</style>
+</helmet>
+<div style="max-width:720px;margin:0 auto;padding:20px 16px 120px;display:flex;flex-direction:column;gap:16px">
+  <header style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <h1 style="font-size:30px;margin:0">Admin</h1>
+    <span style="font-style:italic;color:var(--color-neutral-700)">Raccolta 2026</span>
+    <span style="flex:1"></span>
+    <sc-if value="{{ isDemo }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent">Demo-Modus</span></sc-if>
+    <a href="index.html" class="btn btn-ghost">Zur Status-Seite</a>
+  </header>
+
+  <sc-if value="{{ notAuthed }}" hint-placeholder-val="{{ true }}">
+    <section class="card" style="padding:24px;gap:14px">
+      <h2 style="font-size:22px;margin:0">PIN eingeben</h2>
+      <sc-if value="{{ isDemo }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:var(--color-neutral-700)">Demo-PIN: 2026</span></sc-if>
+      <div style="display:flex;gap:10px">
+        <input class="input" type="password" inputmode="numeric" placeholder="PIN" value="{{ pinIn }}" onChange="{{ onPinIn }}" onKeyDown="{{ onPinKey }}" style="max-width:200px;font-size:18px">
+        <button class="btn btn-primary" onClick="{{ onLogin }}">Login</button>
+      </div>
+      <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-accent-700);font-weight:600">{{ err }}</span></sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+    <section class="card" style="padding:20px;gap:12px;background:var(--color-accent)">
+      <div style="display:flex;align-items:baseline;gap:8px;color:var(--color-neutral-100)"><h2 style="font-size:22px;margin:0">Wildschwein gesichtet?</h2></div>
+      <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px">
+        <select class="input" value="{{ f.bSector }}" onChange="{{ set.bSector }}">
+          <option value="">Sektor</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+        </select>
+        <input class="input" placeholder="Notiz, z. B. Rotte am Bach" value="{{ f.bNote }}" onChange="{{ set.bNote }}">
+      </div>
+      <button class="btn btn-block" onClick="{{ onBoar }}" style="background:var(--color-accent-800);color:var(--color-neutral-100);min-height:52px;font-size:18px">Alarm auslösen (4 h)</button>
+      <sc-if value="{{ boarActive }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;color:var(--color-neutral-100)">
+          <span style="flex:1;font-weight:600">Alarm aktiv seit {{ boarSince }}</span>
+          <button class="btn btn-secondary" onClick="{{ onBoarEnd }}" style="background:var(--color-neutral-100)">Entwarnung</button>
+        </div>
+      </sc-if>
+    </section>
+
+    <section class="card" style="padding:16px 20px;gap:10px;position:sticky;top:8px;z-index:5;box-shadow:var(--shadow-md)">
+      <label style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Tag für Tageswerte</label>
+      <select class="input" value="{{ date }}" onChange="{{ onDate }}" style="font-size:16px;font-weight:600">
+        <sc-for list="{{ dateOptions }}" as="o" hint-placeholder-count="16"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+      </select>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:8px"><h2 style="font-size:22px;margin:0">Ernte</h2><span style="flex:1"></span><span style="font-weight:700">{{ dayTotal }} heute · {{ total }} gesamt</span></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:8px">
+        <input class="input" type="number" inputmode="decimal" placeholder="kg" value="{{ f.kg }}" onChange="{{ set.kg }}" style="font-size:18px">
+        <select class="input" value="{{ f.sector }}" onChange="{{ set.sector }}">
+          <option value="1">Sektor 1</option><option value="2">Sektor 2</option><option value="3">Sektor 3</option><option value="4">Sektor 4</option><option value="5">Sektor 5</option>
+        </select>
+        <button class="btn btn-primary" onClick="{{ onAddKg }}">+ kg</button>
+      </div>
+      <sc-for list="{{ harvest }}" as="h" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--color-divider)">
+          <span style="font-weight:700;min-width:70px">{{ h.kg }} kg</span><span style="flex:1;color:var(--color-neutral-700)">Sektor {{ h.sector }}</span>
+          <button class="btn btn-ghost" onClick="{{ h.onDel }}">Löschen</button>
+        </div>
+      </sc-for>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <h2 style="font-size:22px;margin:0">Sektoren</h2>
+      <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Aktiv in Arbeit</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="5"><button class="{{ s.cls }}" onClick="{{ s.onActive }}" style="min-width:48px;min-height:44px">{{ s.id }}</button></sc-for>
+      </div>
+      <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:70px minmax(0,1fr) 52px;align-items:center;gap:10px">
+          <span style="font-weight:700">Sektor {{ s.id }}</span>
+          <input type="range" min="0" max="100" step="5" value="{{ s.pct }}" onChange="{{ s.onPct }}">
+          <span style="text-align:right;font-weight:700">{{ s.pct }} %</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:8px"><h2 style="font-size:22px;margin:0">Crew vor Ort</h2><span style="flex:1"></span><span style="font-weight:700">{{ crewCount }}/13</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ crew }}" as="c" hint-placeholder-count="13"><button class="{{ c.cls }}" onClick="{{ c.onToggle }}" style="min-height:44px">{{ c.name }}</button></sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <h2 style="font-size:22px;margin:0">Tageswerte · {{ dateLabel }}</h2>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+          <span style="font-weight:700">Dolce-Vita-Faktor</span><span style="flex:1"></span>
+          <span style="font-family:var(--font-heading);font-size:22px">{{ dv }} %</span>
+          <sc-if value="{{ dvAuto }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">automatisch</span></sc-if>
+        </div>
+        <input type="range" min="0" max="100" step="1" value="{{ dv }}" onChange="{{ onDv }}">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--color-neutral-700)">
+          <span>Vorschlag: {{ dvSuggest }} %</span>
+          <button class="btn btn-ghost" onClick="{{ onDvAuto }}">Automatisch verwenden</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700">Pizzen</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-secondary" onClick="{{ onPizzaMinus }}" style="width:44px;height:44px">–</button>
+            <span style="font-family:var(--font-heading);font-size:26px;min-width:36px;text-align:center">{{ pizzas }}</span>
+            <button class="btn btn-primary" onClick="{{ onPizzaPlus }}" style="width:44px;height:44px">+</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700">Pool °C</span>
+          <input class="input" type="number" inputmode="decimal" step="0.1" placeholder="z. B. 18.5" value="{{ pool }}" onChange="{{ onPool }}" style="font-size:18px">
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:8px"><span style="font-weight:700">Puzzle (gesamt)</span><span style="flex:1"></span><span style="font-family:var(--font-heading);font-size:22px">{{ puzzle }} %</span></div>
+        <input type="range" min="0" max="100" step="1" value="{{ puzzle }}" onChange="{{ onPuzzle }}">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-weight:700">Küchentemperatur</span>
+        <div style="display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:8px">
+          <input class="input" type="time" value="{{ f.kT }}" onChange="{{ set.kT }}">
+          <input class="input" type="number" inputmode="decimal" step="0.1" placeholder="°C" value="{{ f.kC }}" onChange="{{ set.kC }}">
+          <button class="btn btn-primary" onClick="{{ onAddK }}">+</button>
+        </div>
+        <sc-for list="{{ kitchen }}" as="k" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:10px;padding:4px 0;border-top:1px solid var(--color-divider)">
+            <span style="min-width:60px">{{ k.t }}</span><span style="flex:1;font-weight:700">{{ k.c }} °C</span>
+            <button class="btn btn-ghost" onClick="{{ k.onDel }}">Löschen</button>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <h2 style="font-size:22px;margin:0">Gericht des Tages</h2>
+      <input class="input" placeholder="Name des Gerichts" value="{{ dishName }}" onChange="{{ onDishName }}">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:96px;height:96px;flex:none;border-radius:50%;overflow:hidden;background:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--color-accent-800)">
+          <sc-if value="{{ dishPhoto }}" hint-placeholder-val="{{ false }}"><div style="width:100%;height:100%;background-size:cover;background-position:center;background-image:{{ dishBg }}"></div></sc-if>
+          <sc-if value="{{ noDishPhoto }}" hint-placeholder-val="{{ true }}"><span>kein Foto</span></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="btn btn-secondary" style="cursor:pointer">{{ uploadLabel }}<input type="file" accept="image/*" onChange="{{ onPhoto }}" style="display:none"></label>
+          <sc-if value="{{ dishPhoto }}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost" onClick="{{ onPhotoDel }}">Foto entfernen</button></sc-if>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <h2 style="font-size:22px;margin:0">Mühle · Fabrizio</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        <input class="input" type="date" value="{{ f.mDate }}" onChange="{{ set.mDate }}">
+        <input class="input" type="number" inputmode="decimal" placeholder="Oliven kg (gewogen)" value="{{ f.mKg }}" onChange="{{ set.mKg }}">
+        <input class="input" type="number" inputmode="decimal" placeholder="Öl kg" value="{{ f.mOilKg }}" onChange="{{ set.mOilKg }}">
+        <input class="input" type="number" inputmode="decimal" placeholder="{{ mOilLPh }}" value="{{ f.mOilL }}" onChange="{{ set.mOilL }}">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="flex:1;font-size:13px;color:var(--color-neutral-700)">Ölgehalt: {{ mYield }}</span><button class="btn btn-primary" onClick="{{ onAddMill }}">Lieferung hinzufügen</button></div>
+      <sc-for list="{{ mill }}" as="m" hint-placeholder-count="1">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--color-divider);font-size:14px">
+          <span style="flex:1"><b>{{ m.label }}</b> · {{ m.kg }} kg → {{ m.oilKg }} kg / {{ m.oilL }} L · {{ m.yield }}</span>
+          <button class="btn btn-ghost" onClick="{{ m.onDel }}">Löschen</button>
+        </div>
+      </sc-for>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <h2 style="font-size:22px;margin:0">Haus-Barometer</h2>
+      <sc-for list="{{ house }}" as="h" hint-placeholder-count="7">
+        <div style="display:flex;flex-direction:column;gap:4px;padding:6px 0;border-top:1px solid var(--color-divider)">
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font-weight:700">{{ h.de }}</span><span style="font-style:italic;font-size:13px;color:var(--color-neutral-700)">{{ h.it }}</span><span style="flex:1"></span><span style="font-weight:700">{{ h.pct }} %</span></div>
+          <input type="range" min="0" max="100" step="5" value="{{ h.pct }}" onChange="{{ h.onPct }}">
+          <div style="display:flex;gap:8px"><input class="input" placeholder="Notiz (optional)" value="{{ h.note }}" onChange="{{ h.onNote }}"><button class="btn btn-ghost" onClick="{{ h.onDel }}">×</button></div>
+        </div>
+      </sc-for>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px">
+        <input class="input" placeholder="Neu (DE)" value="{{ f.hDe }}" onChange="{{ set.hDe }}">
+        <input class="input" placeholder="Nuovo (IT)" value="{{ f.hIt }}" onChange="{{ set.hIt }}">
+        <button class="btn btn-secondary" onClick="{{ onAddHouse }}">+</button>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:12px">
+      <h2 style="font-size:22px;margin:0">Ziele</h2>
+      <sc-for list="{{ goals }}" as="g" hint-placeholder-count="1">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center">
+          <input class="input" type="number" value="{{ g.kg }}" onChange="{{ g.onKg }}">
+          <input class="input" type="date" value="{{ g.deadline }}" onChange="{{ g.onDl }}">
+          <button class="btn btn-ghost" onClick="{{ g.onDel }}">×</button>
+        </div>
+      </sc-for>
+      <button class="btn btn-secondary" onClick="{{ onAddGoal }}">+ Neues Ziel</button>
+    </section>
+
+    <section class="card" style="padding:20px;gap:10px">
+      <h2 style="font-size:22px;margin:0">Wildschwein-Sichtungen</h2>
+      <sc-for list="{{ boar }}" as="b" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--color-divider);font-size:14px">
+          <span style="flex:1"><b>{{ b.when }}</b> · Sektor {{ b.sector }} · {{ b.note }}</span>
+          <button class="btn btn-ghost" onClick="{{ b.onDel }}">Löschen</button>
+        </div>
+      </sc-for>
+    </section>
+
+    <sc-if value="{{ isDemo }}" hint-placeholder-val="{{ false }}">
+      <section class="card" style="padding:20px;gap:10px">
+        <h2 style="font-size:18px;margin:0">Demo</h2>
+        <span style="font-size:13px;color:var(--color-neutral-700)">Ohne Google-Sheet-URL in config.js bleiben alle Daten nur in diesem Browser.</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onClick="{{ onResetDemo }}">Beispieldaten laden</button>
+          <button class="btn btn-ghost" onClick="{{ onClear }}">Alles leeren</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <div style="position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;background:color-mix(in srgb,var(--color-bg) 88%,transparent);backdrop-filter:blur(8px);z-index:10">
+      <div style="width:100%;max-width:688px;display:flex;align-items:center;gap:12px">
+        <span style="flex:1;font-size:13px;font-weight:600;color:var(--color-neutral-700)">{{ msg }}</span>
+        <button class="btn btn-primary" onClick="{{ onSave }}" disabled="{{ saveDisabled }}" style="min-height:48px;padding:0 28px;font-size:16px">{{ saveLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { authed: false, pin: '', pinIn: '', err: '', data: null, date: null, dirty: false, saving: false, uploading: false, msg: '',
+    f: { kg: '', sector: '1', kT: '', kC: '', mDate: '', mKg: '', mOilKg: '', mOilL: '', bSector: '', bNote: '', hDe: '', hIt: '' } };
+
+  componentDidMount() {
+    const go = async () => {
+      if (!window.Olive) return setTimeout(go, 50);
+      const O = window.Olive, t = O.today();
+      const date = O.DAYS.includes(t) ? t : O.START;
+      this.setState(s => ({ date, f: { ...s.f, mDate: date } }));
+      const pin = sessionStorage.getItem('olive_pin');
+      if (pin && await O.auth(pin)) this.login(pin);
+    };
+    go();
+    this.beforeUnload = e => { if (this.state.dirty) { e.preventDefault(); e.returnValue = ''; } };
+    window.addEventListener('beforeunload', this.beforeUnload);
+  }
+  componentWillUnmount() { window.removeEventListener('beforeunload', this.beforeUnload); }
+
+  async login(pin) {
+    try {
+      const data = await window.Olive.load();
+      sessionStorage.setItem('olive_pin', pin);
+      this.setState({ authed: true, pin, data, err: '' });
+    } catch (e) { this.setState({ err: 'Daten konnten nicht geladen werden.' }); }
+  }
+  async tryLogin() {
+    const ok = await window.Olive.auth(this.state.pinIn);
+    if (ok) this.login(this.state.pinIn); else this.setState({ err: 'PIN falsch.' });
+  }
+  edit(fn, after) { this.setState(s => { const d = JSON.parse(JSON.stringify(s.data)); fn(d); return { data: d, dirty: true, msg: 'Ungespeicherte Änderungen' }; }, after); }
+  day(d) { return d.days[this.state.date] || (d.days[this.state.date] = { dolceVita: null, pizzas: 0, puzzle: null, pool: null, kitchen: [], dish: { name: '', photo: '' } }); }
+  async save() {
+    this.setState({ saving: true, msg: 'Speichere …' });
+    try { await window.Olive.save(this.state.data, this.state.pin); this.setState({ saving: false, dirty: false, msg: 'Gespeichert ✓ ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) }); }
+    catch (e) { this.setState({ saving: false, msg: 'Fehler: ' + e.message }); }
+  }
+  async photo(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    this.setState({ uploading: true, msg: 'Foto wird verarbeitet …' });
+    try {
+      const O = window.Olive, url = await O.upload(await O.resizeImage(file, O.isDemo ? 700 : 1400), 'gericht-' + this.state.date + '.jpg', this.state.pin);
+      this.edit(d => { const x = this.day(d); x.dish = { ...(x.dish || {}), photo: url }; }, () => this.save());
+    } catch (err) { this.setState({ msg: 'Upload fehlgeschlagen: ' + err.message }); }
+    this.setState({ uploading: false }); e.target.value = '';
+  }
+
+  renderVals() {
+    const O = window.Olive;
+    const st = this.state, s = st.data;
+    const set = {}; Object.keys(st.f).forEach(k => set[k] = e => { const v = e.target.value; this.setState(x => ({ f: { ...x.f, [k]: v } })); });
+    const base = { isDemo: O ? O.isDemo : false, notAuthed: !st.authed, ready: st.authed && !!s, pinIn: st.pinIn, err: st.err, f: st.f, set,
+      onPinIn: e => this.setState({ pinIn: e.target.value }), onPinKey: e => { if (e.key === 'Enter') this.tryLogin(); }, onLogin: () => this.tryLogin() };
+    if (!O || !s) return base;
+    const { num, fmtDay } = O, date = st.date, dd = s.days[date] || {};
+    const id = () => Math.random().toString(36).slice(2, 9);
+    const byDay = O.harvestByDay(s);
+    const ba = O.boarActive(s);
+    const sugg = O.dolceSuggest(s, date), dvAuto = dd.dolceVita == null || dd.dolceVita === '';
+    const mk = Number(st.f.mKg), mo = Number(st.f.mOilKg);
+    return { ...base,
+      date, dateLabel: fmtDay(date),
+      dateOptions: O.DAYS.map(d => ({ value: d, label: fmtDay(d) + (d === O.today() ? ' · heute' : '') })),
+      onDate: e => this.setState({ date: e.target.value }),
+      total: num(O.totalKg(s), 1) + ' kg', dayTotal: num(byDay[date] || 0, 1) + ' kg',
+      harvest: s.harvest.filter(h => h.date === date).map(h => ({ kg: num(h.kg, 1), sector: h.sector, onDel: () => this.edit(d => d.harvest = d.harvest.filter(x => x.id !== h.id)) })),
+      onAddKg: () => { const kg = parseFloat(String(st.f.kg).replace(',', '.')); if (!kg) return; this.edit(d => d.harvest.push({ id: id(), date, kg, sector: Number(st.f.sector) })); this.setState(x => ({ f: { ...x.f, kg: '' } })); },
+      sectors: [1, 2, 3, 4, 5].map(i => ({ id: i, pct: Number(s.sectors[i] || 0), cls: Number(s.activeSector) === i ? 'btn btn-primary' : 'btn btn-secondary',
+        onActive: () => this.edit(d => d.activeSector = i), onPct: e => { const v = Number(e.target.value); this.edit(d => d.sectors[i] = v); } })),
+      crewCount: Object.values(s.crew).filter(Boolean).length,
+      crew: O.CREW.map(n => ({ name: n, cls: s.crew[n] ? 'btn btn-primary' : 'btn btn-secondary', onToggle: () => this.edit(d => d.crew[n] = !d.crew[n]) })),
+      dv: dvAuto ? sugg : Number(dd.dolceVita), dvAuto, dvSuggest: sugg,
+      onDv: e => { const v = Number(e.target.value); this.edit(d => this.day(d).dolceVita = v); },
+      onDvAuto: () => this.edit(d => this.day(d).dolceVita = null),
+      pizzas: Number(dd.pizzas || 0),
+      onPizzaPlus: () => this.edit(d => { const x = this.day(d); x.pizzas = Number(x.pizzas || 0) + 1; }),
+      onPizzaMinus: () => this.edit(d => { const x = this.day(d); x.pizzas = Math.max(0, Number(x.pizzas || 0) - 1); }),
+      pool: dd.pool == null ? '' : dd.pool,
+      onPool: e => { const v = e.target.value; this.edit(d => this.day(d).pool = v === '' ? null : Number(v)); },
+      puzzle: dd.puzzle == null || dd.puzzle === '' ? 0 : Number(dd.puzzle),
+      onPuzzle: e => { const v = Number(e.target.value); this.edit(d => this.day(d).puzzle = v); },
+      kitchen: (dd.kitchen || []).map((k, i) => ({ t: k.t, c: num(k.c, 1), onDel: () => this.edit(d => this.day(d).kitchen.splice(i, 1)) })),
+      onAddK: () => {
+        const c = parseFloat(String(st.f.kC).replace(',', '.')); if (isNaN(c)) return;
+        const t = st.f.kT || new Date().toTimeString().slice(0, 5);
+        this.edit(d => { const x = this.day(d); x.kitchen = (x.kitchen || []).concat({ t, c }).sort((a, b) => a.t < b.t ? -1 : 1); });
+        this.setState(x => ({ f: { ...x.f, kC: '', kT: '' } }));
+      },
+      dishName: (dd.dish && dd.dish.name) || '', dishPhoto: (dd.dish && dd.dish.photo) || '', noDishPhoto: !(dd.dish && dd.dish.photo), dishBg: dd.dish && dd.dish.photo ? 'url("' + dd.dish.photo + '")' : 'none',
+      onDishName: e => { const v = e.target.value; this.edit(d => { const x = this.day(d); x.dish = { ...(x.dish || {}), name: v }; }); },
+      onPhoto: e => this.photo(e), onPhotoDel: () => this.edit(d => { this.day(d).dish.photo = ''; }),
+      uploadLabel: st.uploading ? 'Lädt …' : 'Foto hochladen',
+      mOilLPh: mo ? 'Öl L (≈ ' + num(mo / 0.916, 1) + ')' : 'Öl Liter', mYield: mk && mo ? num(mo / mk * 100, 1) + ' %' : '–',
+      onAddMill: () => {
+        if (!mk) return;
+        const oilL = st.f.mOilL !== '' ? Number(st.f.mOilL) : Math.round(mo / 0.916 * 10) / 10;
+        this.edit(d => d.mill.push({ id: id(), date: st.f.mDate || date, kg: mk, oilKg: mo, oilL }));
+        this.setState(x => ({ f: { ...x.f, mKg: '', mOilKg: '', mOilL: '' } }));
+      },
+      mill: s.mill.map(m => ({ label: fmtDay(m.date), kg: num(m.kg, 1), oilKg: num(m.oilKg, 1), oilL: num(m.oilL, 1), yield: m.kg ? num(m.oilKg / m.kg * 100, 1) + ' %' : '', onDel: () => this.edit(d => d.mill = d.mill.filter(x => x.id !== m.id)) })),
+      house: s.house.map((h, i) => ({ de: h.de, it: h.it, pct: Number(h.pct || 0), note: h.note || '',
+        onPct: e => { const v = Number(e.target.value); this.edit(d => d.house[i].pct = v); },
+        onNote: e => { const v = e.target.value; this.edit(d => d.house[i].note = v); },
+        onDel: () => this.edit(d => d.house.splice(i, 1)) })),
+      onAddHouse: () => { if (!st.f.hDe) return; this.edit(d => d.house.push({ key: id(), de: st.f.hDe, it: st.f.hIt || st.f.hDe, pct: 100, note: '' })); this.setState(x => ({ f: { ...x.f, hDe: '', hIt: '' } })); },
+      goals: s.goals.map((g, i) => ({ kg: g.kg, deadline: g.deadline,
+        onKg: e => { const v = Number(e.target.value); this.edit(d => d.goals[i].kg = v); },
+        onDl: e => { const v = e.target.value; this.edit(d => d.goals[i].deadline = v); },
+        onDel: () => this.edit(d => d.goals.splice(i, 1)) })),
+      onAddGoal: () => this.edit(d => { const l = d.goals[d.goals.length - 1] || { kg: 400, deadline: '2026-10-28' }; d.goals.push({ kg: l.kg + 200, deadline: O.addDays(l.deadline, 4) }); }),
+      boarActive: !!ba, boarSince: ba ? new Date(ba.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '',
+      onBoar: () => { this.edit(d => d.boar.push({ id: id(), ts: Date.now(), sector: st.f.bSector ? Number(st.f.bSector) : null, note: st.f.bNote }), () => this.save()); this.setState(x => ({ f: { ...x.f, bNote: '' } })); },
+      onBoarEnd: () => this.edit(d => { const b = d.boar.find(x => x.id === ba.id); if (b) b.ended = Date.now(); }, () => this.save()),
+      boar: s.boar.slice().sort((a, b) => b.ts - a.ts).map(b => ({ when: new Date(b.ts).toLocaleString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }), sector: b.sector || '?', note: b.note || '', onDel: () => this.edit(d => d.boar = d.boar.filter(x => x.id !== b.id)) })),
+      onResetDemo: () => { if (confirm('Beispieldaten laden? Eigene Demo-Eingaben gehen verloren.')) this.setState({ data: O.demoState(), dirty: true, msg: 'Beispieldaten – speichern zum Übernehmen' }); },
+      onClear: () => { if (confirm('Alle Daten leeren?')) this.setState({ data: O.emptyState(), dirty: true, msg: 'Geleert – speichern zum Übernehmen' }); },
+      onSave: () => this.save(), saveDisabled: st.saving || !st.dirty, saveLabel: st.saving ? 'Speichere …' : 'Speichern',
+      msg: st.msg
+    };
+  }
+}
+</script>
+</body>
+</html>

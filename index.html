@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raccolta 2026 · Olivenernte Pescia</title>
+<link rel="stylesheet" href="design/styles.css">
+<script src="design/_ds_bundle.js"></script>
+<script src="config.js"></script>
+<script src="olive-data.js"></script>
+<style>
+body{margin:0;background:var(--color-bg);color:var(--color-text);-webkit-font-smoothing:antialiased}
+a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-600)}
+@keyframes oliPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--color-accent) 55%,transparent)}70%{box-shadow:0 0 0 18px color-mix(in srgb,var(--color-accent) 0%,transparent)}100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--color-accent) 0%,transparent)}}
+@keyframes oliDash{to{stroke-dashoffset:-32}}
+@keyframes oliBlink{50%{opacity:.35}}
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:20px 16px 56px;display:flex;flex-direction:column;gap:16px;font-variant-numeric:tabular-nums">
+
+  <header style="display:flex;flex-direction:column;gap:10px;padding:8px 4px 4px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span class="tag tag-accent-2">Pescia (PT) · Toscana</span>
+      <span class="tag tag-outline">{{ dayLabel }}</span>
+      <sc-if value="{{ isDemo }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent">Demo-Daten</span></sc-if>
+    </div>
+    <h1 style="font-size:clamp(38px,9vw,64px);margin:0;line-height:1">Raccolta 2026</h1>
+    <div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:baseline;font-size:15px">
+      <span style="font-weight:600">Olivenernte · Status-Seite</span>
+      <span style="color:var(--color-neutral-700)">24.10.–08.11.2026</span>
+      <span style="color:var(--color-neutral-700);font-size:13px">{{ updatedLabel }}</span>
+    </div>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;align-items:start">
+
+    <section class="card" style="grid-column:1/-1;padding:22px;gap:18px;background:var(--color-accent-2-200)">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:24px;margin:0">Geerntet</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Olive raccolte</span>
+        <span style="flex:1"></span>
+        <span class="tag tag-accent-2" style="background:var(--color-accent-2-600);color:var(--color-neutral-100)">{{ goalTag }}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px 32px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+            <span style="font-family:var(--font-heading);font-size:clamp(64px,16vw,96px);line-height:.9;color:var(--color-accent-2-800)">{{ totalStr }}</span>
+            <span style="font-family:var(--font-heading);font-size:26px;color:var(--color-accent-2-800)">kg</span>
+            <span style="font-size:15px;color:var(--color-accent-2-800)">von {{ goalKg }} kg</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="position:relative;height:30px;border-radius:999px;background:var(--color-neutral-100);overflow:hidden;box-shadow:inset 0 1px 3px color-mix(in srgb,var(--color-text) 14%,transparent)">
+              <div style="position:absolute;inset:0 auto 0 0;width:{{ pctW }};border-radius:999px;background:var(--color-accent-2-600);transition:width .8s ease"></div>
+              <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="7">
+                <div style="position:absolute;top:8px;bottom:8px;width:2px;border-radius:2px;left:{{ t.left }};background:color-mix(in srgb,var(--color-text) 18%,transparent)"></div>
+              </sc-for>
+              <div style="position:absolute;right:12px;top:0;bottom:0;display:flex;align-items:center;font-weight:700;font-size:14px">{{ pctStr }}</div>
+            </div>
+            <div style="position:relative;height:16px;font-size:11px;color:var(--color-accent-2-800)">
+              <sc-for list="{{ tickLabels }}" as="t" hint-placeholder-count="4">
+                <span style="position:absolute;left:{{ t.left }};transform:translateX(-50%)">{{ t.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+            <div style="display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--radius-md);background:var(--color-neutral-100)">
+              <span class="card-kicker" style="color:var(--color-accent-2-700)">Fehlen</span>
+              <span style="font-family:var(--font-heading);font-size:22px">{{ remainingStr }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--radius-md);background:var(--color-neutral-100)">
+              <span class="card-kicker" style="color:var(--color-accent-2-700)">Deadline</span>
+              <span style="font-family:var(--font-heading);font-size:22px">{{ deadlineStr }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--radius-md);background:var(--color-neutral-100)">
+              <span class="card-kicker" style="color:var(--color-accent-2-700)">Nötig / Tag</span>
+              <span style="font-family:var(--font-heading);font-size:22px">{{ needStr }}</span>
+            </div>
+          </div>
+          <sc-if value="{{ hasReached }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ reached }}" as="g" hint-placeholder-count="1"><span class="tag tag-accent-2">✓ {{ g.label }}</span></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">
+            <span class="card-kicker" style="color:var(--color-accent-2-700)">Soll / Ist · Prognose</span>
+            <span style="font-size:13px;font-weight:600;color:var(--color-accent-2-800)">{{ projLabel }}</span>
+          </div>
+          <svg viewBox="0 0 320 130" style="width:100%;height:auto;overflow:visible">
+            <line x1="0" x2="320" y1="{{ goalY }}" y2="{{ goalY }}" style="stroke:var(--color-accent-2-700);stroke-width:1.5;stroke-dasharray:2 5;stroke-linecap:round"></line>
+            <polyline points="{{ sollPts }}" style="fill:none;stroke:var(--color-neutral-500);stroke-width:2.5;stroke-dasharray:6 6;stroke-linecap:round"></polyline>
+            <polyline points="{{ projPts }}" style="fill:none;stroke:var(--color-accent);stroke-width:2.5;stroke-dasharray:3 6;stroke-linecap:round"></polyline>
+            <polygon points="{{ istArea }}" style="fill:var(--color-accent-2-500);fill-opacity:.25"></polygon>
+            <polyline points="{{ istPts }}" style="fill:none;stroke:var(--color-accent-2-700);stroke-width:4;stroke-linecap:round;stroke-linejoin:round"></polyline>
+            <circle cx="{{ lastX }}" cy="{{ lastY }}" r="6" style="fill:var(--color-accent-2-700);stroke:var(--color-accent-2-200);stroke-width:3"></circle>
+            <text x="4" y="{{ goalLabelY }}" style="font-size:10px;fill:var(--color-accent-2-800);font-family:var(--font-body);font-weight:700">{{ goalLabel }}</text>
+          </svg>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-accent-2-800)">
+            <sc-for list="{{ axisDays }}" as="d" hint-placeholder-count="5"><span>{{ d }}</span></sc-for>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--color-accent-2-800)">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:4px;border-radius:4px;background:var(--color-accent-2-700)"></span>Ist</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:0;border-top:2.5px dashed var(--color-neutral-500)"></span>Soll</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:0;border-top:2.5px dotted var(--color-accent)"></span>Prognose</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+            <span class="card-kicker" style="color:var(--color-accent-2-700)">kg pro Tag · al giorno</span>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:84px">
+              <sc-for list="{{ dayBars }}" as="b" hint-placeholder-count="4">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%">
+                  <span style="font-size:11px;font-weight:700">{{ b.kg }}</span>
+                  <div style="width:100%;max-width:34px;height:{{ b.h }};min-height:4px;border-radius:10px 10px 4px 4px;background:var(--color-accent-2-600)"></div>
+                  <span style="font-size:10px;color:var(--color-accent-2-800)">{{ b.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ boarOn }}" hint-placeholder-val="{{ false }}">
+      <section class="card" style="padding:20px;gap:12px;background:var(--color-accent);color:var(--color-neutral-100);animation:oliPulse 1.8s ease-out infinite">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:12px;height:12px;border-radius:50%;background:var(--color-neutral-100);animation:oliBlink 1s steps(1) infinite"></span>
+          <span class="card-kicker" style="color:var(--color-neutral-100);font-size:12px;font-weight:700">Alarm attivo · noch {{ boarRemaining }}</span>
+        </div>
+        <h2 style="font-size:30px;margin:0;line-height:1.05">Wildschwein-Alarm!</h2>
+        <span style="font-style:italic;margin-top:-6px">Allarme cinghiale!</span>
+        <div style="display:flex;flex-direction:column;gap:2px;font-size:15px">
+          <span>Gesichtet {{ boarWhen }} · Sektor {{ boarSector }}</span>
+          <span style="font-weight:600">{{ boarNote }}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:6px">
+          <span style="font-size:13px">Türen zu, Netze checken, Salami in Sicherheit bringen.</span>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;flex:none;border-radius:50%;background:var(--color-accent-800)">
+            <span style="font-family:var(--font-heading);font-size:24px;line-height:1">{{ boarCount }}</span>
+            <span style="font-size:9px;letter-spacing:.08em;text-transform:uppercase">Sicht.</span>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Sektoren</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Settori</span>
+        <span style="flex:1"></span><span class="tag tag-accent">aktiv: Sektor {{ activeSector }}</span>
+      </div>
+      <svg viewBox="-6 -6 690 372" style="width:100%;height:auto">
+        <g style="fill:var(--color-neutral-300)">
+          <path d="M0,5 L182,105 L158,155 L165,185 L178,190 L210,182 L222,172 L238,178 L240,200 L260,205 L265,228 L240,240 L222,248 L208,238 L222,220 L218,205 L190,205 L165,212 L45,135 L40,105 L10,80 L8,30 Z"></path>
+          <path d="M130,50 L157,33 L268,100 L285,95 L318,104 L323,84 L340,71 L370,72 L400,82 L414,86 L422,103 L437,120 L430,135 L428,172 L370,157 L330,155 L318,140 L298,138 L284,150 L185,90 L138,65 Z"></path>
+          <path d="M438,130 L460,106 L482,95 L498,127 L625,155 L650,185 L677,186 L660,225 L625,242 L555,228 L500,215 L440,205 L436,165 Z"></path>
+          <path d="M390,243 L455,240 L458,215 L500,220 L560,235 L615,254 L590,268 L555,305 L495,330 L465,352 L440,350 L420,342 L395,345 L365,342 L380,285 Z"></path>
+          <path d="M290,256 L372,280 L358,340 L335,352 L310,348 L270,358 L225,358 L205,330 L203,284 L225,288 L242,298 L250,293 L276,295 Z"></path>
+        </g>
+        <g style="fill:var(--color-accent-2-500)">
+          <path fill-opacity="{{ op1 }}" d="M0,5 L182,105 L158,155 L165,185 L178,190 L210,182 L222,172 L238,178 L240,200 L260,205 L265,228 L240,240 L222,248 L208,238 L222,220 L218,205 L190,205 L165,212 L45,135 L40,105 L10,80 L8,30 Z"></path>
+          <path fill-opacity="{{ op2 }}" d="M130,50 L157,33 L268,100 L285,95 L318,104 L323,84 L340,71 L370,72 L400,82 L414,86 L422,103 L437,120 L430,135 L428,172 L370,157 L330,155 L318,140 L298,138 L284,150 L185,90 L138,65 Z"></path>
+          <path fill-opacity="{{ op3 }}" d="M438,130 L460,106 L482,95 L498,127 L625,155 L650,185 L677,186 L660,225 L625,242 L555,228 L500,215 L440,205 L436,165 Z"></path>
+          <path fill-opacity="{{ op4 }}" d="M390,243 L455,240 L458,215 L500,220 L560,235 L615,254 L590,268 L555,305 L495,330 L465,352 L440,350 L420,342 L395,345 L365,342 L380,285 Z"></path>
+          <path fill-opacity="{{ op5 }}" d="M290,256 L372,280 L358,340 L335,352 L310,348 L270,358 L225,358 L205,330 L203,284 L225,288 L242,298 L250,293 L276,295 Z"></path>
+        </g>
+        <path d="{{ activePath }}" style="fill:none;stroke:var(--color-accent);stroke-width:5;stroke-linejoin:round;stroke-dasharray:18 14;animation:oliDash 1.2s linear infinite"></path>
+        <g style="fill:var(--color-text)">
+          <path d="M350,163 L392,168 L430,182 L425,200 L410,203 L352,190 Z"></path>
+          <rect x="291" y="145" width="12" height="12" rx="2"></rect>
+          <rect x="328" y="164" width="14" height="14" rx="2"></rect>
+          <rect x="338" y="174" width="14" height="12" rx="2"></rect>
+        </g>
+        <path d="M326,200 Q335,220 380,228" style="fill:none;stroke:var(--color-text);stroke-width:2.5;stroke-linecap:round"></path>
+        <g style="font-family:var(--font-heading);fill:var(--color-text)" text-anchor="middle">
+          <text x="105" y="122" font-size="34">1</text><text x="105" y="146" font-size="17" style="font-family:var(--font-body);font-weight:700">{{ p1 }}</text>
+          <text x="362" y="118" font-size="34">2</text><text x="362" y="142" font-size="17" style="font-family:var(--font-body);font-weight:700">{{ p2 }}</text>
+          <text x="548" y="186" font-size="34">3</text><text x="548" y="210" font-size="17" style="font-family:var(--font-body);font-weight:700">{{ p3 }}</text>
+          <text x="480" y="286" font-size="34">4</text><text x="480" y="310" font-size="17" style="font-family:var(--font-body);font-weight:700">{{ p4 }}</text>
+          <text x="298" y="312" font-size="34">5</text><text x="298" y="336" font-size="17" style="font-family:var(--font-body);font-weight:700">{{ p5 }}</text>
+        </g>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:13px">
+            <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-family:var(--font-heading);background:{{ s.dotBg }};color:{{ s.dotFg }}">{{ s.id }}</span>
+            <div style="height:10px;border-radius:999px;background:var(--color-neutral-300);overflow:hidden"><div style="height:100%;width:{{ s.w }};border-radius:999px;background:var(--color-accent-2-600)"></div></div>
+            <span style="text-align:right"><b>{{ s.pctStr }}</b> <span style="color:var(--color-neutral-700)">{{ s.kgStr }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Mühle</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Il frantoio di Fabrizio</span>
+      </div>
+      <sc-if value="{{ hasMill }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <div style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:var(--radius-md);background:var(--color-bg)">
+            <span class="card-kicker">Oliven gewogen</span>
+            <span style="font-family:var(--font-heading);font-size:30px;line-height:1.1">{{ millKg }} <span style="font-size:16px">kg</span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:var(--radius-md);background:var(--color-bg)">
+            <span class="card-kicker">Ölgehalt · resa</span>
+            <span style="font-family:var(--font-heading);font-size:30px;line-height:1.1;color:var(--color-accent-700)">{{ millYield }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:var(--radius-md);background:var(--color-accent-200)">
+            <span class="card-kicker" style="color:var(--color-accent-800)">Öl · olio</span>
+            <span style="font-family:var(--font-heading);font-size:30px;line-height:1.1;color:var(--color-accent-800)">{{ millOilKg }} <span style="font-size:16px">kg</span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:var(--radius-md);background:var(--color-accent-200)">
+            <span class="card-kicker" style="color:var(--color-accent-800)">Öl · litri</span>
+            <span style="font-family:var(--font-heading);font-size:30px;line-height:1.1;color:var(--color-accent-800)">{{ millOilL }} <span style="font-size:16px">L</span></span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;height:26px;border-radius:999px;overflow:hidden;background:var(--color-neutral-300)">
+            <div style="width:{{ millYieldW }};background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--color-neutral-100)">Öl</div>
+            <div style="flex:1;display:flex;align-items:center;padding-left:10px;font-size:11px;color:var(--color-neutral-800)">Trester, Wasser, Kerne</div>
+          </div>
+          <span style="font-size:13px;color:var(--color-neutral-700)">{{ millFact }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ mill }}" as="m" hint-placeholder-count="1">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:8px 0;border-top:1px solid var(--color-divider);font-size:13px">
+              <span style="font-weight:600">{{ m.label }}</span><span>{{ m.kg }} kg → {{ m.oilL }} L</span><span style="font-weight:700;color:var(--color-accent-700)">{{ m.yield }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noMill }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:16px;padding:10px 0">
+          <div style="width:72px;height:72px;flex:none;border-radius:50% 50% 50% 8px;background:var(--color-accent-200)"></div>
+          <span style="color:var(--color-neutral-700)">Noch keine Lieferung bei Fabrizio. Sobald er gewogen und gepresst hat, stehen hier Menge, Öl und Ölgehalt.</span>
+        </div>
+      </sc-if>
+    </section>
+
+    <section class="card" style="grid-column:1/-1;padding:20px;gap:18px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Wetter vor Ort</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Il meteo a Pescia</span>
+        <span style="flex:1"></span><span style="font-size:12px;color:var(--color-neutral-700)">{{ wUpdated }}</span>
+      </div>
+      <sc-if value="{{ wErr }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-accent-700)">{{ wErr }}</span></sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px 28px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:18px">
+            <div style="width:92px;height:92px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--color-accent-200);color:var(--color-accent-700)">{{ wIcon }}</div>
+            <div style="display:flex;flex-direction:column">
+              <span style="font-family:var(--font-heading);font-size:58px;line-height:1">{{ wTemp }}</span>
+              <span style="font-weight:600">{{ wCond }}</span>
+              <span style="font-size:13px;color:var(--color-neutral-700)">gefühlt · percepita {{ wFeels }}</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <sc-for list="{{ wStats }}" as="x" hint-placeholder-count="12">
+              <div style="display:flex;flex-direction:column;gap:1px;padding:10px 12px;border-radius:var(--radius-md);background:var(--color-bg)">
+                <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">{{ x.k }}</span>
+                <span style="font-weight:700;font-size:15px">{{ x.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+              <span class="card-kicker">Nächste 24 h · prossime 24 ore</span>
+              <span style="display:flex;gap:12px;font-size:11px;color:var(--color-neutral-700)"><span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:4px;border-radius:4px;background:var(--color-accent)"></span>°C</span><span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:10px;border-radius:3px;background:var(--color-accent-2-300)"></span>Regen %</span></span>
+            </div>
+            <svg viewBox="0 0 480 120" preserveAspectRatio="none" style="width:100%;height:120px">
+              <line x1="0" x2="480" y1="60" y2="60" style="stroke:var(--color-divider);stroke-dasharray:2 6"></line>
+              <polygon points="{{ hRain }}" style="fill:var(--color-accent-2-300)"></polygon>
+              <polyline points="{{ hTemp }}" vector-effect="non-scaling-stroke" style="fill:none;stroke:var(--color-accent);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round"></polyline>
+            </svg>
+            <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;text-align:center">
+              <sc-for list="{{ hLabels }}" as="h" hint-placeholder-count="8">
+                <div style="display:flex;flex-direction:column;font-size:11px;line-height:1.35">
+                  <span style="color:var(--color-neutral-700)">{{ h.t }}</span><span style="font-weight:700">{{ h.temp }}</span><span style="color:var(--color-accent-2-700)">{{ h.p }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span class="card-kicker">7 Tage · 7 giorni</span>
+            <sc-for list="{{ wDays }}" as="d" hint-placeholder-count="7">
+              <div style="display:grid;grid-template-columns:56px 26px 44px 34px minmax(0,1fr) 34px;align-items:center;gap:8px;padding:5px 0;font-size:13px">
+                <span style="font-weight:700">{{ d.wd }}</span>
+                <span style="display:flex;color:var(--color-accent-700)">{{ d.icon }}</span>
+                <span style="color:var(--color-accent-2-700);font-size:12px">{{ d.p }}</span>
+                <span style="text-align:right;color:var(--color-neutral-700)">{{ d.min }}</span>
+                <div style="position:relative;height:8px;border-radius:999px;background:var(--color-neutral-300)"><div style="position:absolute;top:0;bottom:0;left:{{ d.left }};width:{{ d.width }};border-radius:999px;background:var(--color-accent)"></div></div>
+                <span style="font-weight:700">{{ d.max }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Crew vor Ort</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">La squadra</span>
+        <span style="flex:1"></span><span style="font-family:var(--font-heading);font-size:22px">{{ presentCount }}<span style="font-size:14px;color:var(--color-neutral-700)">/13</span></span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:12px 6px">
+        <sc-for list="{{ crew }}" as="c" hint-placeholder-count="13">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;opacity:{{ c.op }}">
+            <div style="position:relative;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:18px;background:{{ c.bg }};color:{{ c.fg }}">
+              {{ c.ini }}
+              <sc-if value="{{ c.present }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:0;bottom:1px;width:14px;height:14px;border-radius:50%;background:var(--color-accent);border:3px solid var(--color-surface)"></span></sc-if>
+            </div>
+            <span style="font-size:12px;font-weight:600">{{ c.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Dolce-Vita-Faktor</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Fattore dolce vita</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span style="font-family:var(--font-heading);font-size:56px;line-height:1;color:var(--color-accent-700)">{{ dvToday }}</span>
+        <span style="font-size:13px;color:var(--color-neutral-700)">{{ dvNote }}</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:120px">
+        <sc-for list="{{ dvBars }}" as="b" hint-placeholder-count="4">
+          <div style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px">
+            <span style="font-size:11px;font-weight:700">{{ b.v }}</span>
+            <div style="width:100%;max-width:38px;height:{{ b.h }};border-radius:999px 999px 10px 10px;background:{{ b.bg }}"></div>
+            <span style="font-size:10px;color:var(--color-neutral-700)">{{ b.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size:11px;color:var(--color-neutral-700)">Helle Balken = automatisch geschätzt aus Pizza, Pool, Gericht &amp; Crew.</span>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Puzzle</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Il puzzle</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <svg viewBox="0 0 140 140" style="width:140px;height:140px;flex:none">
+          <circle cx="70" cy="70" r="54" style="fill:none;stroke:var(--color-neutral-300);stroke-width:16"></circle>
+          <circle cx="70" cy="70" r="54" transform="rotate(-90 70 70)" stroke-dasharray="{{ puzzleDash }}" style="fill:none;stroke:var(--color-accent-2-600);stroke-width:16;stroke-linecap:round;transition:stroke-dasharray .8s"></circle>
+          <text x="70" y="80" text-anchor="middle" style="font-family:var(--font-heading);font-size:30px;fill:var(--color-text)">{{ puzzleStr }}</text>
+        </svg>
+        <div style="flex:1;min-width:150px;display:flex;flex-direction:column;gap:6px">
+          <span class="card-kicker" style="color:var(--color-accent-2-700)">Verlauf</span>
+          <svg viewBox="0 0 200 70" preserveAspectRatio="none" style="width:100%;height:70px">
+            <polyline points="{{ puzzlePts }}" vector-effect="non-scaling-stroke" style="fill:none;stroke:var(--color-accent-2-600);stroke-width:3;stroke-linecap:round;stroke-linejoin:round"></polyline>
+          </svg>
+          <span style="font-size:13px;color:var(--color-neutral-700)">{{ puzzleNote }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Küche</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Temperatura in cucina</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span style="font-family:var(--font-heading);font-size:48px;line-height:1">{{ kNow }}</span>
+        <span style="font-size:13px;color:var(--color-neutral-700)">{{ kNowLabel }}</span>
+        <span style="flex:1"></span>
+        <span class="tag tag-neutral" style="gap:4px"><span>min</span><span>{{ kMin }}</span></span><span class="tag tag-accent" style="gap:4px"><span>max</span><span>{{ kMax }}</span></span>
+      </div>
+      <svg viewBox="0 0 300 100" preserveAspectRatio="none" style="width:100%;height:100px">
+        <polygon points="{{ kArea }}" style="fill:var(--color-accent-300);fill-opacity:.5"></polygon>
+        <polyline points="{{ kPts }}" vector-effect="non-scaling-stroke" style="fill:none;stroke:var(--color-accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round"></polyline>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-700)">
+        <sc-for list="{{ kDays }}" as="d" hint-placeholder-count="4"><span>{{ d }}</span></sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Pool</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">La piscina</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px">
+        <div style="position:relative;width:34px;height:150px;flex:none;border-radius:999px;background:var(--color-neutral-300);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;bottom:0;height:{{ poolH }};border-radius:999px;background:var(--color-accent-2-500);transition:height .8s"></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+          <span style="font-family:var(--font-heading);font-size:52px;line-height:1">{{ poolStr }}</span>
+          <span style="font-weight:600">{{ poolVerdict }}</span>
+          <svg viewBox="0 0 200 50" preserveAspectRatio="none" style="width:100%;height:50px">
+            <polyline points="{{ poolPts }}" vector-effect="non-scaling-stroke" style="fill:none;stroke:var(--color-accent-2-600);stroke-width:3;stroke-linecap:round;stroke-linejoin:round"></polyline>
+          </svg>
+          <span style="font-size:11px;color:var(--color-neutral-700)">Verlauf seit Ankunft · {{ poolRange }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Pizza-Zähler</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Pizze mangiate</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <span style="font-family:var(--font-heading);font-size:64px;line-height:1;color:var(--color-accent-700)">{{ pizzaTotal }}</span>
+        <span style="font-size:13px;color:var(--color-neutral-700)">{{ pizzaPer }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ pizzaDays }}" as="p" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:54px minmax(0,1fr) 22px;align-items:center;gap:8px;font-size:12px">
+            <span style="color:var(--color-neutral-700)">{{ p.label }}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="2"><span style="width:16px;height:16px;border-radius:50%;background:var(--color-accent);box-shadow:inset 0 0 0 3px var(--color-accent-300)"></span></sc-for>
+            </div>
+            <span style="font-weight:700;text-align:right">{{ p.n }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Gericht des Tages</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Il piatto del giorno</span>
+      </div>
+      <sc-if value="{{ hasDish }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;aspect-ratio:4/3;border-radius:var(--radius-lg);overflow:hidden;background:var(--color-accent-200)">
+          <sc-if value="{{ dish.hasPhoto }}" hint-placeholder-val="{{ false }}">
+            <div class="washed" role="img" aria-label="{{ dish.name }}" style="width:100%;height:100%;background-size:cover;background-position:center;background-image:{{ dish.bg }}"></div>
+          </sc-if>
+          <sc-if value="{{ dish.noPhoto }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+              <div style="width:46%;aspect-ratio:1;border-radius:50%;background:var(--color-accent-300);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-accent-800)">Foto folgt</div>
+            </div>
+          </sc-if>
+          <span class="tag" style="position:absolute;left:12px;top:12px;background:var(--color-neutral-100)">{{ dish.label }}</span>
+        </div>
+        <span style="font-family:var(--font-heading);font-size:22px;line-height:1.15">{{ dish.name }}</span>
+        <sc-if value="{{ hasGallery }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px">
+            <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="3">
+              <div style="flex:none;width:110px;display:flex;flex-direction:column;gap:4px">
+                <div style="width:110px;height:110px;border-radius:50%;overflow:hidden;background:var(--color-accent-200);display:flex;align-items:center;justify-content:center">
+                  <sc-if value="{{ g.hasPhoto }}" hint-placeholder-val="{{ false }}"><div class="washed" role="img" aria-label="{{ g.name }}" style="width:100%;height:100%;background-size:cover;background-position:center;background-image:{{ g.bg }}"></div></sc-if>
+                  <sc-if value="{{ g.noPhoto }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;color:var(--color-accent-800)">{{ g.label }}</span></sc-if>
+                </div>
+                <span style="font-size:11px;color:var(--color-neutral-700)">{{ g.label }}</span>
+                <span style="font-size:12px;font-weight:600;line-height:1.25">{{ g.name }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+    </section>
+
+    <section class="card" style="padding:20px;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h2 style="font-size:22px;margin:0">Haus-Barometer</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Stato della casa</span>
+        <span style="flex:1"></span><span class="tag tag-accent-2">Ø {{ houseAvg }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ house }}" as="h" hint-placeholder-count="7">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:baseline;gap:6px;font-size:13px">
+              <span style="font-weight:700">{{ h.de }}</span><span style="font-style:italic;color:var(--color-neutral-700)">{{ h.it }}</span>
+              <span style="flex:1"></span><span style="font-weight:700;color:{{ h.fg }}">{{ h.pctStr }}</span>
+            </div>
+            <div style="height:12px;border-radius:999px;background:var(--color-neutral-300);overflow:hidden"><div style="height:100%;width:{{ h.w }};border-radius:999px;background:{{ h.bg }}"></div></div>
+            <sc-if value="{{ h.note }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--color-neutral-700)">{{ h.note }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{ boarOff }}" hint-placeholder-val="{{ true }}">
+      <section class="card" style="padding:20px;gap:10px">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+          <h2 style="font-size:22px;margin:0">Wildschwein-Radar</h2><span style="font-style:italic;font-size:14px;color:var(--color-neutral-700)">Radar cinghiali</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:72px;height:72px;flex:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--color-accent-2-200)">
+            <span style="font-family:var(--font-heading);font-size:26px;line-height:1">{{ boarCount }}</span>
+            <span style="font-size:9px;letter-spacing:.08em;text-transform:uppercase">Sicht.</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-weight:700">Alles ruhig · Tutto tranquillo</span>
+            <span style="font-size:13px;color:var(--color-neutral-700)">{{ boarLast }}</span>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+  </div>
+
+  <footer style="display:flex;gap:10px 18px;flex-wrap:wrap;justify-content:space-between;padding:8px 4px;font-size:12px;color:var(--color-neutral-700)">
+    <span>Wetter: Open-Meteo · 43,90° N 10,69° E · aktualisiert alle 15 min</span>
+    <a href="admin.html">Admin</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ICONS = {
+  sun: [['circle', { cx: 12, cy: 12, r: 4 }], 'M12 2v2', 'M12 20v2', 'm4.93 4.93 1.41 1.41', 'm17.66 17.66 1.41 1.41', 'M2 12h2', 'M20 12h2', 'm6.34 17.66-1.41 1.41', 'm19.07 4.93-1.41 1.41'],
+  moon: ['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'],
+  cloudSun: ['M12 2v2', 'm4.93 4.93 1.41 1.41', 'M20 12h2', 'm19.07 4.93-1.41 1.41', 'M15.947 12.65a4 4 0 0 0-5.925-4.128', 'M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z'],
+  cloud: ['M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'],
+  fog: ['M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', 'M16 17H7', 'M17 21H9'],
+  drizzle: ['M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', 'M8 19v1', 'M8 14v1', 'M16 19v1', 'M16 14v1', 'M12 21v1', 'M12 16v1'],
+  rain: ['M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', 'M16 14v6', 'M8 14v6', 'M12 16v6'],
+  storm: ['M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973', 'm13 12-3 5h4l-3 5']
+};
+const icon = (n, size) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.75, strokeLinecap: 'round', strokeLinejoin: 'round' },
+  (ICONS[n] || ICONS.cloud).map((p, i) => typeof p === 'string' ? React.createElement('path', { key: i, d: p }) : React.createElement(p[0], { key: i, ...p[1] })));
+const WMO = c => c === 0 ? ['Klar', 'Sereno', 'sun'] : c <= 2 ? ['Leicht bewölkt', 'Poco nuvoloso', 'cloudSun'] : c === 3 ? ['Bedeckt', 'Coperto', 'cloud'] : c <= 48 ? ['Nebel', 'Nebbia', 'fog'] : c <= 57 ? ['Nieselregen', 'Pioviggine', 'drizzle'] : c <= 67 ? ['Regen', 'Pioggia', 'rain'] : c <= 77 ? ['Schnee', 'Neve', 'cloud'] : c <= 82 ? ['Schauer', 'Rovesci', 'rain'] : ['Gewitter', 'Temporale', 'storm'];
+const PATHS = {
+  1: 'M0,5 L182,105 L158,155 L165,185 L178,190 L210,182 L222,172 L238,178 L240,200 L260,205 L265,228 L240,240 L222,248 L208,238 L222,220 L218,205 L190,205 L165,212 L45,135 L40,105 L10,80 L8,30 Z',
+  2: 'M130,50 L157,33 L268,100 L285,95 L318,104 L323,84 L340,71 L370,72 L400,82 L414,86 L422,103 L437,120 L430,135 L428,172 L370,157 L330,155 L318,140 L298,138 L284,150 L185,90 L138,65 Z',
+  3: 'M438,130 L460,106 L482,95 L498,127 L625,155 L650,185 L677,186 L660,225 L625,242 L555,228 L500,215 L440,205 L436,165 Z',
+  4: 'M390,243 L455,240 L458,215 L500,220 L560,235 L615,254 L590,268 L555,305 L495,330 L465,352 L440,350 L420,342 L395,345 L365,342 L380,285 Z',
+  5: 'M290,256 L372,280 L358,340 L335,352 L310,348 L270,358 L225,358 L205,330 L203,284 L225,288 L242,298 L250,293 L276,295 Z'
+};
+const line = (vals, W, H, lo, hi, pad = 6) => {
+  if (!vals.length) return '';
+  const r = (hi - lo) || 1, n = vals.length;
+  return vals.map((v, i) => [(n === 1 ? W / 2 : i / (n - 1) * W).toFixed(1), (H - pad - (v - lo) / r * (H - pad * 2)).toFixed(1)].join(',')).join(' ');
+};
+
+class Component extends DCLogic {
+  state = { data: null, w: null, wErr: null, wAt: null, now: Date.now() };
+  componentDidMount() {
+    const go = () => { if (!window.Olive) return (this.t0 = setTimeout(go, 50)); this.refresh(); this.refreshW(); };
+    go();
+    this.t1 = setInterval(() => this.refresh(), 60000);
+    this.t2 = setInterval(() => this.refreshW(), 15 * 60000);
+    this.t3 = setInterval(() => this.setState({ now: Date.now() }), 30000);
+  }
+  componentWillUnmount() { clearTimeout(this.t0); clearInterval(this.t1); clearInterval(this.t2); clearInterval(this.t3); }
+  async refresh() { try { this.setState({ data: await window.Olive.load() }); } catch (e) { console.warn(e); } }
+  async refreshW() { try { this.setState({ w: await window.Olive.weather(), wErr: null, wAt: Date.now() }); } catch (e) { this.setState({ wErr: 'Wetterdaten gerade nicht erreichbar.' }); } }
+
+  renderVals() {
+    const O = window.Olive;
+    if (!O) return { loading: true };
+    const s = this.state.data || O.emptyState();
+    const { num, fmtDay, diffDays, addDays, START, END } = O;
+    const today = O.today();
+    const v = {};
+    v.isDemo = O.isDemo;
+
+    const dIdx = diffDays(START, today);
+    v.dayLabel = dIdx < 0 ? 'Start in ' + (-dIdx) + (dIdx === -1 ? ' Tag' : ' Tagen') : dIdx > 15 ? 'Ernte beendet · finita' : 'Tag ' + (dIdx + 1) + ' von 16 · giorno ' + (dIdx + 1);
+    const mins = s.updated ? Math.round((this.state.now - s.updated) / 60000) : null;
+    v.updatedLabel = mins == null ? '' : mins < 1 ? 'gerade aktualisiert' : mins < 60 ? 'aktualisiert vor ' + mins + ' min' : 'aktualisiert ' + new Date(s.updated).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+
+    // harvest & goal
+    const byDay = O.harvestByDay(s), total = O.totalKg(s);
+    const goals = [...(s.goals || [])].sort((a, b) => a.kg - b.kg);
+    const goal = goals.find(g => total < g.kg) || goals[goals.length - 1] || { kg: 400, deadline: '2026-10-28' };
+    const reached = goals.filter(g => total >= g.kg);
+    v.reached = reached.map(g => ({ label: g.kg + ' kg erreicht' }));
+    v.hasReached = reached.length > 0;
+    v.totalStr = num(total, 1); v.goalKg = goal.kg; v.goalLabel = 'Ziel ' + goal.kg + ' kg';
+    const pct = Math.min(100, total / goal.kg * 100);
+    v.pctW = pct.toFixed(1) + '%'; v.pctStr = num(pct, 0) + ' %';
+    const step = goal.kg <= 400 ? 50 : 100;
+    v.ticks = []; v.tickLabels = [];
+    for (let k = step; k < goal.kg; k += step) { v.ticks.push({ left: (k / goal.kg * 100) + '%' }); if (k % (step * 2) === 0) v.tickLabels.push({ left: (k / goal.kg * 100) + '%', label: k }); }
+    const remaining = Math.max(0, goal.kg - total);
+    const daysLeft = diffDays(today, goal.deadline) + 1;
+    v.remainingStr = remaining ? num(remaining, 0) + ' kg' : '0 kg';
+    v.deadlineStr = fmtDay(goal.deadline);
+    v.needStr = !remaining ? '–' : daysLeft > 0 ? num(remaining / daysLeft, 0) + ' kg' : '!';
+    v.goalTag = !remaining ? 'Ziel erreicht · obiettivo raggiunto' : daysLeft > 0 ? 'noch ' + daysLeft + (daysLeft === 1 ? ' Tag' : ' Tage') + ' bis zur Deadline' : 'Deadline überschritten';
+
+    // burndown
+    const dl = diffDays(START, goal.deadline), tI = Math.max(0, Math.min(dIdx, diffDays(START, END)));
+    const N = Math.max(dl, tI) + 1;
+    const cum = []; let acc = 0;
+    for (let i = 0; i <= tI; i++) { acc += byDay[addDays(START, i)] || 0; cum.push(acc); }
+    const avg = total / (tI + 1);
+    const proj = dIdx < 0 ? 0 : avg * (dl + 1);
+    const maxY = Math.max(goal.kg, total, proj) * 1.12 || 1;
+    const W = 320, H = 130, X = i => (i / N * W).toFixed(1), Y = val => (H - val / maxY * (H - 6)).toFixed(1);
+    v.goalY = Y(goal.kg); v.goalLabelY = (Number(Y(goal.kg)) - 6).toFixed(1);
+    v.sollPts = `0,${H} ${X(dl + 1)},${Y(goal.kg)}`;
+    const ist = ['0,' + H].concat(dIdx < 0 ? [] : cum.map((c, i) => X(i + 1) + ',' + Y(c)));
+    v.istPts = ist.join(' ');
+    v.istArea = ist.join(' ') + ` ${ist[ist.length - 1].split(',')[0]},${H}`;
+    const last = ist[ist.length - 1].split(','); v.lastX = last[0]; v.lastY = last[1];
+    v.projPts = remaining && tI < dl ? `${last[0]},${last[1]} ${X(dl + 1)},${Y(proj)}` : '';
+    v.projLabel = remaining ? (dIdx < 0 ? 'Start morgen' : 'Prognose ' + fmtDay(goal.deadline) + ': ' + num(proj, 0) + ' kg ' + (proj >= goal.kg ? '✓' : '– Gas geben!')) : 'geschafft in ' + (cum.findIndex(c => c >= goal.kg) + 1) + ' Tagen';
+    v.axisDays = []; for (let i = 0; i < N; i++) v.axisDays.push(String(O.parse(addDays(START, i)).getDate()) + '.');
+    const dayList = dIdx < 0 ? [] : Array.from({ length: tI + 1 }, (_, i) => addDays(START, i));
+    const maxDay = Math.max(1, ...dayList.map(d => byDay[d] || 0));
+    v.dayBars = dayList.map(d => ({ label: O.WD[O.parse(d).getDay()], kg: num(byDay[d] || 0, 0), h: ((byDay[d] || 0) / maxDay * 62) + 'px' }));
+
+    // sectors
+    const secKg = {}; s.harvest.forEach(h => secKg[h.sector] = (secKg[h.sector] || 0) + Number(h.kg || 0));
+    v.activeSector = s.activeSector; v.activePath = PATHS[s.activeSector] || '';
+    v.sectors = [1, 2, 3, 4, 5].map(i => {
+      const p = Number(s.sectors[i] || 0), act = Number(s.activeSector) === i;
+      v['op' + i] = (p / 100 * 0.9).toFixed(2); v['p' + i] = p + ' %';
+      return { id: i, pctStr: p + ' %', w: p + '%', kgStr: secKg[i] ? num(secKg[i], 0) + ' kg' : '', dotBg: act ? 'var(--color-accent)' : p >= 100 ? 'var(--color-accent-2-600)' : 'var(--color-neutral-300)', dotFg: act || p >= 100 ? 'var(--color-neutral-100)' : 'var(--color-text)' };
+    });
+
+    // mill
+    const mill = s.mill || [];
+    v.hasMill = mill.length > 0; v.noMill = !v.hasMill;
+    const mk = mill.reduce((a, m) => a + Number(m.kg || 0), 0), mo = mill.reduce((a, m) => a + Number(m.oilKg || 0), 0), ml = mill.reduce((a, m) => a + Number(m.oilL || (m.oilKg / 0.916) || 0), 0);
+    const y = mk ? mo / mk * 100 : 0;
+    v.millKg = num(mk, 1); v.millOilKg = num(mo, 1); v.millOilL = num(ml, 1); v.millYield = num(y, 1) + ' %'; v.millYieldW = Math.max(8, y) + '%';
+    const crewN = Object.values(s.crew).filter(Boolean).length;
+    v.millFact = mk ? `${num(ml / mk * 100, 1)} L Öl pro 100 kg Oliven · ≈ ${num(ml / Math.max(1, crewN), 1)} L pro Crew-Mitglied vor Ort` : '';
+    v.mill = mill.slice().sort((a, b) => a.date < b.date ? 1 : -1).map(m => ({ label: fmtDay(m.date), kg: num(m.kg, 0), oilL: num(m.oilL || m.oilKg / 0.916, 1), yield: m.kg ? num(m.oilKg / m.kg * 100, 1) + ' %' : '' }));
+
+    // weather
+    const w = this.state.w;
+    v.wErr = this.state.wErr || '';
+    v.wUpdated = this.state.wAt ? 'Stand ' + new Date(this.state.wAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'lädt …';
+    if (w && w.current) {
+      const c = w.current, cond = WMO(c.weather_code);
+      v.wIcon = icon(c.is_day === 0 && c.weather_code <= 1 ? 'moon' : cond[2], 46);
+      v.wTemp = num(c.temperature_2m, 1) + '°'; v.wCond = cond[0] + ' · ' + cond[1]; v.wFeels = num(c.apparent_temperature, 1) + '°';
+      const hi = Math.max(0, w.hourly.time.indexOf(c.time.slice(0, 13) + ':00'));
+      const hr = k => w.hourly[k].slice(hi, hi + 24);
+      const dir = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'][Math.round(c.wind_direction_10m / 45) % 8];
+      const sr = w.daily.sunrise[0].slice(11), ss = w.daily.sunset[0].slice(11);
+      const len = (Date.parse(w.daily.sunset[0]) - Date.parse(w.daily.sunrise[0])) / 60000;
+      v.wStats = [
+        { k: 'Wind', v: num(c.wind_speed_10m, 0) + ' km/h ' + dir }, { k: 'Böen', v: num(c.wind_gusts_10m, 0) + ' km/h' }, { k: 'Feuchte', v: num(c.relative_humidity_2m, 0) + ' %' },
+        { k: 'Taupunkt', v: num(c.dew_point_2m, 1) + '°' }, { k: 'Regen jetzt', v: num(c.precipitation, 1) + ' mm' }, { k: 'UV-Index', v: num(w.hourly.uv_index[hi], 1) },
+        { k: 'Luftdruck', v: num(c.surface_pressure, 0) + ' hPa' }, { k: 'Wolken', v: num(c.cloud_cover, 0) + ' %' }, { k: 'Regen heute', v: num(w.daily.precipitation_sum[0], 1) + ' mm' },
+        { k: 'Sonne auf', v: sr }, { k: 'Sonne unter', v: ss }, { k: 'Tageslänge', v: Math.floor(len / 60) + ' h ' + Math.round(len % 60) + ' m' },
+        { k: 'Boden 0 cm', v: num(w.hourly.soil_temperature_0cm[hi], 1) + '°' }, { k: 'Bodenfeuchte', v: num(w.hourly.soil_moisture_0_to_1cm[hi] * 100, 0) + ' %' }, { k: 'Regen 24 h', v: num(hr('precipitation').reduce((a, b) => a + (b || 0), 0), 1) + ' mm' }
+      ];
+      const ht = hr('temperature_2m'), hp = hr('precipitation_probability');
+      const tlo = Math.min(...ht) - 1, thi = Math.max(...ht) + 1;
+      v.hTemp = line(ht, 480, 120, tlo, thi, 10);
+      v.hRain = '0,120 ' + hp.map((p, i) => (i / (hp.length - 1) * 480).toFixed(1) + ',' + (120 - (p || 0) / 100 * 110).toFixed(1)).join(' ') + ' 480,120';
+      v.hLabels = [0, 3, 6, 9, 12, 15, 18, 21].map(i => ({ t: (w.hourly.time[hi + i] || '').slice(11, 13) + 'h', temp: num(ht[i], 0) + '°', p: num(hp[i] || 0, 0) + '%' }));
+      const dmin = Math.min(...w.daily.temperature_2m_min), dmax = Math.max(...w.daily.temperature_2m_max), dr = (dmax - dmin) || 1;
+      v.wDays = w.daily.time.map((t, i) => ({
+        wd: i === 0 ? 'Heute' : O.WD[O.parse(t).getDay()] + ' ' + O.parse(t).getDate() + '.',
+        icon: icon(WMO(w.daily.weather_code[i])[2], 20), p: num(w.daily.precipitation_probability_max[i] || 0, 0) + '%',
+        min: num(w.daily.temperature_2m_min[i], 0) + '°', max: num(w.daily.temperature_2m_max[i], 0) + '°',
+        left: ((w.daily.temperature_2m_min[i] - dmin) / dr * 100) + '%', width: Math.max(6, (w.daily.temperature_2m_max[i] - w.daily.temperature_2m_min[i]) / dr * 100) + '%'
+      }));
+    } else { v.wTemp = '–°'; v.wCond = this.state.wErr ? '' : 'lädt …'; v.wStats = []; v.hLabels = []; v.wDays = []; }
+
+    // crew
+    v.presentCount = crewN;
+    v.crew = O.CREW.map(n => { const p = !!s.crew[n]; return { name: n, present: p, ini: n.includes('-') ? n.split('-').map(x => x[0]).join('') : n.slice(0, 2), bg: p ? 'var(--color-accent-2-600)' : 'var(--color-neutral-300)', fg: p ? 'var(--color-neutral-100)' : 'var(--color-neutral-700)', op: p ? 1 : 0.6 }; });
+
+    // per-day metrics
+    const past = dIdx < 0 ? [] : O.DAYS.filter(d => d <= today);
+    const dv = past.map(d => ({ d, ...O.dolceFor(s, d) }));
+    const dvT = dv[dv.length - 1];
+    v.dvToday = dvT ? dvT.v + ' %' : '–';
+    v.dvNote = dvT ? (dvT.auto ? 'heute · geschätzt' : 'heute') + ' · Ø ' + Math.round(dv.reduce((a, b) => a + b.v, 0) / dv.length) + ' %' : 'ab 24.10.';
+    v.dvBars = dv.map(x => ({ label: O.WD[O.parse(x.d).getDay()], v: x.v, h: (x.v / 100 * 86) + 'px', bg: x.auto ? 'var(--color-accent-300)' : 'var(--color-accent)' }));
+
+    const pz = past.map(d => s.days[d] && s.days[d].puzzle != null && s.days[d].puzzle !== '' ? Number(s.days[d].puzzle) : null);
+    let pl = 0; const pzF = pz.map(p => (pl = p == null ? pl : p));
+    const puzzle = pzF.length ? pzF[pzF.length - 1] : 0;
+    const C = 2 * Math.PI * 54;
+    v.puzzleDash = (C * puzzle / 100).toFixed(1) + ' ' + C.toFixed(1); v.puzzleStr = puzzle + '%';
+    v.puzzlePts = line([0, ...pzF], 200, 70, 0, 100, 4);
+    const rate = pzF.length ? puzzle / pzF.length : 0;
+    v.puzzleNote = puzzle >= 100 ? 'Fertig! Rahmen bestellen.' : rate > 0 ? `≈ ${num(rate, 0)} % pro Tag · fertig in ca. ${Math.ceil((100 - puzzle) / rate)} Tagen` : 'Noch kein Teil gelegt.';
+
+    const kr = []; past.forEach(d => ((s.days[d] || {}).kitchen || []).slice().sort((a, b) => a.t < b.t ? -1 : 1).forEach(r => kr.push({ d, t: r.t, c: Number(r.c) })));
+    const kc = kr.map(r => r.c), klo = Math.min(...kc, 15) - 1, khi = Math.max(...kc, 22) + 1;
+    v.kPts = line(kc, 300, 100, klo, khi); v.kArea = kc.length ? '0,100 ' + v.kPts + ' 300,100' : '';
+    const kl = kr[kr.length - 1];
+    v.kNow = kl ? num(kl.c, 1) + '°' : '–'; v.kNowLabel = kl ? 'zuletzt ' + fmtDay(kl.d) + ' ' + kl.t : 'noch keine Messung';
+    v.kMin = kc.length ? num(Math.min(...kc), 1) + '°' : '–'; v.kMax = kc.length ? num(Math.max(...kc), 1) + '°' : '–';
+    v.kDays = past.map(d => fmtDay(d).split(' ')[0]);
+
+    const pool = past.map(d => s.days[d] && s.days[d].pool != null && s.days[d].pool !== '' ? Number(s.days[d].pool) : null).filter(x => x != null);
+    const pNow = pool[pool.length - 1];
+    v.poolStr = pNow != null ? num(pNow, 1) + '°' : '–';
+    v.poolH = pNow != null ? Math.max(6, Math.min(100, (pNow - 8) / 22 * 100)) + '%' : '0%';
+    v.poolVerdict = pNow == null ? 'noch nicht gemessen' : pNow < 16 ? 'Nur für Helden · solo per eroi' : pNow < 20 ? 'Erfrischend · rinfrescante' : pNow < 24 ? 'Angenehm · piacevole' : 'Badewanne · vasca da bagno';
+    v.poolPts = line(pool, 200, 50, Math.min(...pool, 14) - 1, Math.max(...pool, 22) + 1, 4);
+    v.poolRange = pool.length ? num(Math.min(...pool), 1) + '° – ' + num(Math.max(...pool), 1) + '°' : '–';
+
+    const pzd = past.map(d => ({ d, n: Number((s.days[d] || {}).pizzas || 0) }));
+    const pTot = pzd.reduce((a, b) => a + b.n, 0);
+    v.pizzaTotal = pTot; v.pizzaPer = crewN ? '≈ ' + num(pTot / crewN, 1) + ' Pizzen pro Kopf' : '';
+    v.pizzaDays = pzd.map(x => ({ label: fmtDay(x.d), n: x.n, dots: Array.from({ length: x.n }, (_, i) => i) }));
+
+    const dishes = past.slice().reverse().filter(d => s.days[d] && s.days[d].dish && (s.days[d].dish.name || s.days[d].dish.photo)).map(d => { const x = s.days[d].dish; return { label: d === today ? 'Heute · oggi' : fmtDay(d), name: x.name || '', photo: x.photo || '', bg: x.photo ? 'url("' + x.photo + '")' : 'none', hasPhoto: !!x.photo, noPhoto: !x.photo }; });
+    v.hasDish = dishes.length > 0; v.dish = dishes[0] || { hasPhoto: false, noPhoto: true, name: 'Noch kein Highlight', label: '' };
+    if (!dishes.length) v.hasDish = true;
+    v.gallery = dishes.slice(1); v.hasGallery = v.gallery.length > 0;
+
+    v.house = (s.house || []).map(h => { const p = Number(h.pct || 0); return { de: h.de, it: h.it, note: h.note || '', pctStr: p + ' %', w: p + '%', bg: p < 30 ? 'var(--color-accent)' : p < 60 ? 'var(--color-accent-400)' : 'var(--color-accent-2-600)', fg: p < 30 ? 'var(--color-accent-700)' : 'var(--color-text)' }; });
+    v.houseAvg = s.house && s.house.length ? Math.round(s.house.reduce((a, h) => a + Number(h.pct || 0), 0) / s.house.length) + ' %' : '–';
+
+    const boar = O.boarActive(s);
+    v.boarOn = !!boar; v.boarOff = !boar; v.boarCount = (s.boar || []).length;
+    if (boar) {
+      const rem = Math.max(0, Math.min(O.BOAR_HOURS * 3600000, O.BOAR_HOURS * 3600000 - (this.state.now - boar.ts)));
+      v.boarRemaining = Math.floor(rem / 3600000) + ':' + String(Math.floor(rem % 3600000 / 60000)).padStart(2, '0') + ' h';
+      v.boarWhen = 'um ' + new Date(boar.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); v.boarSector = boar.sector || '?'; v.boarNote = boar.note || '';
+    }
+    const lb = (s.boar || []).slice().sort((a, b) => b.ts - a.ts)[0];
+    v.boarLast = lb ? 'Letzte Sichtung: ' + new Date(lb.ts).toLocaleString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }) + (lb.sector ? ' · Sektor ' + lb.sector : '') : 'Noch keine Sichtung gemeldet.';
+    return v;
+  }
+}
+</script>
+</body>
+</html>
