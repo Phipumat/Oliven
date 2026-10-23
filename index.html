@@ -10,8 +10,8 @@
 <helmet>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Raccolta 2026 · Olivenernte Pescia</title>
-<link rel="stylesheet" href="_ds/organic-2f702c05-0577-4211-b954-f470d627702d/styles.css">
-<script src="_ds/organic-2f702c05-0577-4211-b954-f470d627702d/_ds_bundle.js"></script>
+<link rel="stylesheet" href="design/styles.css">
+<script src="design/_ds_bundle.js"></script>
 <script src="config.js"></script>
 <script src="olive-data.js"></script>
 <style>
@@ -99,7 +99,7 @@ a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-600)}
             <polygon points="{{ istArea }}" style="fill:var(--color-accent-2-500);fill-opacity:.25"></polygon>
             <polyline points="{{ istPts }}" style="fill:none;stroke:var(--color-accent-2-700);stroke-width:4;stroke-linecap:round;stroke-linejoin:round"></polyline>
             <circle cx="{{ lastX }}" cy="{{ lastY }}" r="6" style="fill:var(--color-accent-2-700);stroke:var(--color-accent-2-200);stroke-width:3"></circle>
-            <text x="4" y="{{ goalLabelY }}" style="font-size:10px;fill:var(--color-accent-2-800);font-family:var(--font-body);font-weight:700">Ziel {{ goalKg }} kg</text>
+            <text x="4" y="{{ goalLabelY }}" style="font-size:10px;fill:var(--color-accent-2-800);font-family:var(--font-body);font-weight:700">{{ goalLabel }}</text>
           </svg>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-accent-2-800)">
             <sc-for list="{{ axisDays }}" as="d" hint-placeholder-count="5"><span>{{ d }}</span></sc-for>
@@ -557,7 +557,7 @@ class Component extends DCLogic {
     const reached = goals.filter(g => total >= g.kg);
     v.reached = reached.map(g => ({ label: g.kg + ' kg erreicht' }));
     v.hasReached = reached.length > 0;
-    v.totalStr = num(total, 1); v.goalKg = goal.kg;
+    v.totalStr = num(total, 1); v.goalKg = goal.kg; v.goalLabel = 'Ziel ' + goal.kg + ' kg';
     const pct = Math.min(100, total / goal.kg * 100);
     v.pctW = pct.toFixed(1) + '%'; v.pctStr = num(pct, 0) + ' %';
     const step = goal.kg <= 400 ? 50 : 100;
